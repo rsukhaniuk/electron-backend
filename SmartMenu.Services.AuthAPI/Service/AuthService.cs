@@ -192,5 +192,18 @@ namespace SmartMenu.Services.AuthAPI.Service
                 NewPhoneNumber = user.PhoneNumber
             };
         }
+
+        public async Task<IEnumerable<UserDto>> GetUsersByRoleAsync(string role)
+        {
+            var usersInRole = await _userManager.GetUsersInRoleAsync(role);
+
+            return usersInRole.Select(user => new UserDto
+            {
+                ID = user.Id,
+                Email = user.Email,
+                Name = user.UserName,
+                PhoneNumber = user.PhoneNumber
+            }).ToList();
+        }
     }
 }

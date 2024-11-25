@@ -227,5 +227,32 @@ namespace SmartMenu.Services.AuthAPI.Controllers
                 return StatusCode(500, _response);
             }
         }
+
+        [Authorize(Roles = "ADMIN")] 
+        [HttpGet("GetAllManagers")]
+        public async Task<IActionResult> GetAllManagers()
+        {
+            try
+            {
+                var managers = await _authService.GetUsersByRoleAsync("MANAGER");
+
+                if (managers == null || !managers.Any())
+                {
+                    _response.IsSuccess = false;
+                    _response.Message = "No managers found.";
+                    return NotFound(_response);
+                }
+
+                _response.Result = managers;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                return StatusCode(500, _response);
+            }
+        }
     }
 }
