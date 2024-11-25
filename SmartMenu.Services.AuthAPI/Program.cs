@@ -21,6 +21,17 @@ builder.Services.AddIdentity<ApplicationUser,IdentityRole>().AddEntityFrameworkS
     .AddDefaultTokenProviders();
 builder.Services.AddControllers();
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", b =>
+    {
+        b.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddScoped<IStoreService, StoreService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<BackendApiAuthenticationHttpClientHandler>();
@@ -75,6 +86,10 @@ app.UseSwaggerUI(c =>
 
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
+
+
 app.UseAuthentication();
 app.UseAuthorization();
 
