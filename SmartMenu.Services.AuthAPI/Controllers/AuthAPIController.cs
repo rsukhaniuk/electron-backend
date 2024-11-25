@@ -126,6 +126,22 @@ namespace SmartMenu.Services.AuthAPI.Controllers
             {
                 // Retrieve the logged-in user's ID from JWT claims
                 var loggedInUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                var loggedInUserRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+                // Якщо роль адміністратора, дозволяємо видаляти будь-який обліковий запис
+                if (loggedInUserRole?.Equals("ADMIN", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    var adminDeleteSuccessful = await _authService.DeleteAccount(userId);
+                    if (!adminDeleteSuccessful)
+                    {
+                        _response.IsSuccess = false;
+                        _response.Message = "Failed to delete the account. The user may not exist.";
+                        return BadRequest(_response);
+                    }
+
+                    _response.Message = "Account deleted successfully by ADMIN.";
+                    return Ok(_response);
+                }
 
                 if (string.IsNullOrEmpty(loggedInUserId) || !loggedInUserId.Equals(userId, StringComparison.OrdinalIgnoreCase))
                 {
