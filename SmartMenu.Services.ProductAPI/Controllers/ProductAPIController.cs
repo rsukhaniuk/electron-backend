@@ -51,7 +51,7 @@ namespace SmartMenu.Services.ProductAPI.Controllers
             {
                 var query = _db.Products.Include(p => p.Category).AsQueryable();
 
-                // Фільтрація за категорією
+                
                 if (categoryId > 0)
                 {
                     query = query.Where(p => p.CategoryId == categoryId);
@@ -67,7 +67,7 @@ namespace SmartMenu.Services.ProductAPI.Controllers
                     "priceAsc" => query.OrderBy(p => p.Price),
                     "priceDesc" => query.OrderByDescending(p => p.Price),
                     "name" => query.OrderBy(p => p.Name),
-                    _ => query.OrderBy(p => p.Name) // Значення за замовчуванням
+                    _ => query.OrderBy(p => p.Name) 
                 };
 
                 var totalItems = await query.CountAsync();
@@ -81,7 +81,7 @@ namespace SmartMenu.Services.ProductAPI.Controllers
                 {
                     PageIndex = pageIndex,
                     PageSize = pageSize,
-                    TotalItems = totalItems,
+                    Count = totalItems,
                     Data = _mapper.Map<IEnumerable<ProductDto>>(products)
                 };
 
