@@ -12,6 +12,8 @@ namespace SmartMenu.Services.ProductAPI
             {
                 config.CreateMap<ProductDto, Product>().ReverseMap();
                 config.CreateMap<CategoryDto, Category>().ReverseMap();
+                config.CreateMap<StoreDto, Store>().ReverseMap();
+                config.CreateMap<ProductStoreDto, ProductStore>().ReverseMap();
             });
             return mappingConfig;
         }

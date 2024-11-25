@@ -2,15 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FrontEnd", "FrontEnd", "{9DBEDFC7-6695-43A2-A386-869558CE9FCA}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway", "Gateway", "{D844D97F-14F9-4A40-9C15-68170C55DFF7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{ADB819A7-64B4-4AFF-BA2B-69EFB3F6577A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartMenu.Services.CouponAPI", "SmartMenu.Services.CouponAPI\SmartMenu.Services.CouponAPI.csproj", "{D283E2FF-B718-4229-AD4A-489D925C4C22}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartMenu.Web", "SmartMenu.Web\SmartMenu.Web.csproj", "{B7012943-4F4D-4DEA-B93D-63F446118BC1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartMenu.Services.AuthAPI", "SmartMenu.Services.AuthAPI\SmartMenu.Services.AuthAPI.csproj", "{98180658-F43A-479A-8F03-AA6F1829D38A}"
 EndProject
@@ -28,14 +22,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D283E2FF-B718-4229-AD4A-489D925C4C22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D283E2FF-B718-4229-AD4A-489D925C4C22}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D283E2FF-B718-4229-AD4A-489D925C4C22}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D283E2FF-B718-4229-AD4A-489D925C4C22}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B7012943-4F4D-4DEA-B93D-63F446118BC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7012943-4F4D-4DEA-B93D-63F446118BC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B7012943-4F4D-4DEA-B93D-63F446118BC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B7012943-4F4D-4DEA-B93D-63F446118BC1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{98180658-F43A-479A-8F03-AA6F1829D38A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{98180658-F43A-479A-8F03-AA6F1829D38A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98180658-F43A-479A-8F03-AA6F1829D38A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -61,8 +47,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{D283E2FF-B718-4229-AD4A-489D925C4C22} = {ADB819A7-64B4-4AFF-BA2B-69EFB3F6577A}
-		{B7012943-4F4D-4DEA-B93D-63F446118BC1} = {9DBEDFC7-6695-43A2-A386-869558CE9FCA}
 		{98180658-F43A-479A-8F03-AA6F1829D38A} = {ADB819A7-64B4-4AFF-BA2B-69EFB3F6577A}
 		{7AAFE55B-3F8E-4FB9-9E67-15E07E410C02} = {ADB819A7-64B4-4AFF-BA2B-69EFB3F6577A}
 		{4F47DFCC-813E-47D1-ACE0-36828D9E8E4C} = {ADB819A7-64B4-4AFF-BA2B-69EFB3F6577A}
