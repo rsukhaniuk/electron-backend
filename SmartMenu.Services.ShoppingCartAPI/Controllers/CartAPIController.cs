@@ -18,16 +18,14 @@ namespace SmartMenu.Services.ShoppingCartAPI.Controllers
         private IMapper _mapper;
         private readonly AppDbContext _db;
         private IProductService _productService;
-        private ICouponService _couponService;
         private IConfiguration _configuration;
         public CartAPIController(AppDbContext db,
-            IMapper mapper, IProductService productService, ICouponService couponService, IConfiguration configuration)
+            IMapper mapper, IProductService productService, IConfiguration configuration)
         {
             _db = db;
             _productService = productService;
             this._response = new ResponseDto();
             _mapper = mapper;
-            _couponService = couponService;
             _configuration = configuration;
         }
         [HttpGet("GetCart/{userId}")]
