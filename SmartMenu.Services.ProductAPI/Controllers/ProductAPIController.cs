@@ -23,20 +23,76 @@ namespace SmartMenu.Services.ProductAPI.Controllers
             _response = new ResponseDto();
         }
 
+        //[HttpGet]
+        //public ResponseDto Get()
+        //{
+        //    try
+        //    {
+        //        var products = _db.Products.Include(p => p.Category).ToList(); // Include Category
+        //        _response.Result = _mapper.Map<IEnumerable<ProductDto>>(products);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _response.IsSuccess = false;
+        //        _response.Message = ex.Message;
+        //    }
+        //    return _response;
+        //}
+
         [HttpGet]
-        public ResponseDto Get()
+        public async Task<IActionResult> Get(
+            [FromQuery] int categoryId = 0,
+            [FromQuery] string sort = "name",
+            [FromQuery] int pageIndex = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? search = null)
         {
             try
             {
-                var products = _db.Products.Include(p => p.Category).ToList(); // Include Category
-                _response.Result = _mapper.Map<IEnumerable<ProductDto>>(products);
+                var query = _db.Products.Include(p => p.Category).AsQueryable();
+
+                // Фільтрація за категорією
+                if (categoryId > 0)
+                {
+                    query = query.Where(p => p.CategoryId == categoryId);
+                }
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    query = query.Where(p => p.Name.Contains(search) || p.Description.Contains(search));
+                }
+
+                query = sort switch
+                {
+                    "priceAsc" => query.OrderBy(p => p.Price),
+                    "priceDesc" => query.OrderByDescending(p => p.Price),
+                    "name" => query.OrderBy(p => p.Name),
+                    _ => query.OrderBy(p => p.Name) // Значення за замовчуванням
+                };
+
+                var totalItems = await query.CountAsync();
+
+                var products = await query
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                var paginatedResult = new
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    TotalItems = totalItems,
+                    Data = _mapper.Map<IEnumerable<ProductDto>>(products)
+                };
+
+                return Ok(paginatedResult);
             }
             catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.Message = ex.Message;
+                return BadRequest(_response);
             }
-            return _response;
         }
 
         [HttpGet]
