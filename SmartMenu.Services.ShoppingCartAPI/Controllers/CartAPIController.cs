@@ -50,17 +50,6 @@ namespace SmartMenu.Services.ShoppingCartAPI.Controllers
                     cart.CartHeader.CartTotal += (item.Count * item.Product.Price);
                 }
 
-                //apply coupon if any
-                if (!string.IsNullOrEmpty(cart.CartHeader.CouponCode))
-                {
-                    CouponDto coupon = await _couponService.GetCoupon(cart.CartHeader.CouponCode);
-                    if(coupon!=null && cart.CartHeader.CartTotal > coupon.MinAmount)
-                    {
-                        cart.CartHeader.CartTotal -= coupon.DiscountAmount;
-                        cart.CartHeader.Discount=coupon.DiscountAmount;
-                    }
-                }
-
                 _response.Result=cart;
             }
             catch (Exception ex)
@@ -70,83 +59,6 @@ namespace SmartMenu.Services.ShoppingCartAPI.Controllers
             }
             return _response;
         }
-
-
-        [HttpPost("ApplyCoupon")]
-        public async Task<object> ApplyCoupon([FromBody] CartDto cartDto)
-        {
-            try
-            {
-                // Retrieve the cart header from the database
-                var cartFromDb = await _db.CartHeaders.FirstOrDefaultAsync(u => u.UserId == cartDto.CartHeader.UserId);
-                if (cartFromDb == null)
-                {
-                    _response.IsSuccess = false;
-                    _response.Message = "Cart not found.";
-                    return _response;
-                }
-
-                // If CouponCode is empty, clear the coupon without validation
-                if (string.IsNullOrEmpty(cartDto.CartHeader.CouponCode))
-                {
-                    cartFromDb.CouponCode = cartDto.CartHeader.CouponCode;
-                    _db.CartHeaders.Update(cartFromDb);
-                    await _db.SaveChangesAsync();
-                    _response.Result = true;
-
-                    return _response;
-                }
-
-                // Use CouponService to validate the coupon
-                var coupon = await _couponService.GetCoupon(cartDto.CartHeader.CouponCode);
-                if (coupon == null || string.IsNullOrEmpty(coupon.CouponCode))
-                {
-                    _response.IsSuccess = false;
-                    _response.Message = "Invalid coupon code.";
-                    return _response;
-                }
-
-                // Validate the cart total against the coupon's minimum amount
-                if (cartDto.CartHeader.CartTotal < coupon.MinAmount)
-                {
-                    _response.IsSuccess = false;
-                    _response.Message = $"Cart total must be at least {coupon.MinAmount:c} to use this coupon.";
-                    return _response;
-                }
-
-                // Apply the coupon
-                cartFromDb.CouponCode = cartDto.CartHeader.CouponCode;
-                cartFromDb.Discount = coupon.DiscountAmount; // Optionally store the discount amount
-                _db.CartHeaders.Update(cartFromDb);
-                await _db.SaveChangesAsync();
-
-                _response.IsSuccess = true;
-                _response.Result = true;
-            }
-            catch (Exception ex)
-            {
-                _response.IsSuccess = false;
-                _response.Message = ex.ToString();
-            }
-
-            return _response;
-        }
-
-        [HttpPost("EmailCartRequest")]
-        public async Task<object> EmailCartRequest([FromBody] CartDto cartDto)
-        {
-            try
-            {
-                _response.Result = true;
-            }
-            catch (Exception ex)
-            {
-                _response.IsSuccess = false;
-                _response.Message = ex.ToString();
-            }
-            return _response;
-        }
-
 
 
 
