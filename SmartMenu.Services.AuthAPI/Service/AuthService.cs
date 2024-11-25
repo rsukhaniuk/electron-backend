@@ -3,6 +3,8 @@ using SmartMenu.Services.AuthAPI.Models;
 using SmartMenu.Services.AuthAPI.Models.Dto;
 using SmartMenu.Services.AuthAPI.Service.IService;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Stripe.V2;
 
 namespace SmartMenu.Services.AuthAPI.Service
 {
@@ -11,15 +13,17 @@ namespace SmartMenu.Services.AuthAPI.Service
         private readonly AppDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IStoreService _storeService;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
         public AuthService(AppDbContext db, IJwtTokenGenerator jwtTokenGenerator,
-            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IStoreService storeService)
         {
                 _db = db;
             _jwtTokenGenerator = jwtTokenGenerator;
             _userManager = userManager;
             _roleManager = roleManager;
+            _storeService = storeService;
         }
 
         public async Task<bool> AssignRole(string email, string roleName)
@@ -79,7 +83,8 @@ namespace SmartMenu.Services.AuthAPI.Service
                 Email = registrationRequestDto.Email,
                 NormalizedEmail = registrationRequestDto.Email.ToUpper(),
                 Name = registrationRequestDto.Name,
-                PhoneNumber = registrationRequestDto.PhoneNumber
+                PhoneNumber = registrationRequestDto.PhoneNumber,
+                StoreId = registrationRequestDto.Role == "MANAGER" ? registrationRequestDto.StoreId : null
             };
 
             try

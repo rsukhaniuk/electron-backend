@@ -23,7 +23,6 @@ namespace SmartMenu.Services.AuthAPI.Controllers
         }
 
 
-
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationRequestDto model)
         {

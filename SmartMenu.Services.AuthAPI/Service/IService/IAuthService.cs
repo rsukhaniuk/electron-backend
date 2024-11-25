@@ -10,7 +10,8 @@ namespace SmartMenu.Services.AuthAPI.Service.IService
         Task<bool> EditAccount(EditAccountDto editAccountDto);
         Task<bool> DeleteAccount(string email);
         Task<bool> ChangePassword(string userId, ChangePasswordDto changePasswordDto);
-        Task<EditAccountDto?> GetUserDetailsAsync(string userId); 
+        Task<EditAccountDto?> GetUserDetailsAsync(string userId);
+
 
     }
 }
