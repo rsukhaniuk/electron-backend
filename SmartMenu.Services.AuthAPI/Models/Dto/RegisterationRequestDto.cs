@@ -7,7 +7,7 @@
         public string PhoneNumber { get; set; }
         public string Password { get; set; }
         public string? Role { get; set; }
-        public string? StoreId { get; set; }
+        public int? StoreId { get; set; }
 
     }
 }

@@ -7,5 +7,6 @@
         public string? NewPhoneNumber { get; set; }
         public string? NewEmail { get; set; } // New email address to update
         public string? NewRole { get; set; } // New role to update
+        public int? NewStoreId { get; set; } // New store id to update
     }
 }

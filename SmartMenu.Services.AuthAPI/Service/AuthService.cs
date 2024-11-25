@@ -66,8 +66,8 @@ namespace SmartMenu.Services.AuthAPI.Service
                 ID = user.Id,
                 Name = user.Name,
                 PhoneNumber = user.PhoneNumber,
-                Role = role
-
+                Role = role,
+                StoreId = user.StoreId
             };
 
             LoginResponseDto loginResponseDto = new LoginResponseDto()
@@ -194,7 +194,8 @@ namespace SmartMenu.Services.AuthAPI.Service
                 NewName = user.Name,
                 NewEmail = user.Email,
                 NewPhoneNumber = user.PhoneNumber,
-                NewRole = (await _userManager.GetRolesAsync(user)).FirstOrDefault()
+                NewRole = (await _userManager.GetRolesAsync(user)).FirstOrDefault(),
+                NewStoreId = user.StoreId
             };
         }
 
