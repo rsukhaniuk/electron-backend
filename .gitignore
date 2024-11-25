@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/SmartMenu.Services.AuthAPI/appsettings.json
+/SmartMenu.Services.OrderAPI/appsettings.json
+/SmartMenu.Services.ProductAPI/appsettings.json
+/SmartMenu.Services.ShoppingCartAPI/appsettings.json
