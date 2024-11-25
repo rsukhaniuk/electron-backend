@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SmartMenu.Services.OrderAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class AddOrderTables : Migration
+    public partial class AddOrder : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,8 +18,6 @@ namespace SmartMenu.Services.OrderAPI.Migrations
                     OrderHeaderId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CouponCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Discount = table.Column<double>(type: "float", nullable: false),
                     OrderTotal = table.Column<double>(type: "float", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -27,7 +25,9 @@ namespace SmartMenu.Services.OrderAPI.Migrations
                     OrderTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PaymentIntentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StripeSessionId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    StripeSessionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeliveryMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
