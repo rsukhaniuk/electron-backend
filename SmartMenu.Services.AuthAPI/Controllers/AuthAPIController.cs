@@ -55,15 +55,31 @@ namespace SmartMenu.Services.AuthAPI.Controllers
         [HttpPost("AssignRole")]
         public async Task<IActionResult> AssignRole([FromBody] RegistrationRequestDto model)
         {
-            var assignRoleSuccessful = await _authService.AssignRole(model.Email,model.Role.ToUpper());
+            // Check if the role being assigned is "MANAGER"
+            if (model.Role.Equals("MANAGER", StringComparison.OrdinalIgnoreCase))
+            {
+                // Ensure the logged-in user has an ADMIN role
+                var loggedInUserRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+                if (string.IsNullOrEmpty(loggedInUserRole) || !loggedInUserRole.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
+                {
+                    _response.IsSuccess = false;
+                    _response.Message = "Only administrators can assign the MANAGER role.";
+                    return Unauthorized(_response);
+                }
+            }
+
+            // Proceed with assigning the role
+            var assignRoleSuccessful = await _authService.AssignRole(model.Email, model.Role.ToUpper());
             if (!assignRoleSuccessful)
             {
                 _response.IsSuccess = false;
-                _response.Message = "Error encountered";
+                _response.Message = "Error encountered while assigning role.";
                 return BadRequest(_response);
             }
-            return Ok(_response);
 
+            _response.Message = $"Role '{model.Role}' assigned successfully to '{model.Email}'.";
+            return Ok(_response);
         }
 
         [Authorize]
