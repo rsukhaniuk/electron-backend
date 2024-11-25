@@ -214,12 +214,16 @@ namespace SmartMenu.Services.AuthAPI.Controllers
             {
                 // Retrieve the logged-in user's ID from JWT claims
                 var loggedInUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                var loggedInUserRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-                if (string.IsNullOrEmpty(loggedInUserId) || !loggedInUserId.Equals(userId, StringComparison.OrdinalIgnoreCase))
+                if (loggedInUserRole?.Equals("ADMIN", StringComparison.OrdinalIgnoreCase) != true)
                 {
-                    _response.IsSuccess = false;
-                    _response.Message = "You are not authorized to view this account.";
-                    return Unauthorized(_response);
+                    if (string.IsNullOrEmpty(loggedInUserId) || !loggedInUserId.Equals(userId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        _response.IsSuccess = false;
+                        _response.Message = "You are not authorized to view this account.";
+                        return Unauthorized(_response);
+                    }
                 }
 
                 // Retrieve user details

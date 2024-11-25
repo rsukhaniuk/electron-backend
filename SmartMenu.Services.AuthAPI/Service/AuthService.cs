@@ -193,7 +193,8 @@ namespace SmartMenu.Services.AuthAPI.Service
                 UserId = user.Id,
                 NewName = user.Name,
                 NewEmail = user.Email,
-                NewPhoneNumber = user.PhoneNumber
+                NewPhoneNumber = user.PhoneNumber,
+                NewRole = (await _userManager.GetRolesAsync(user)).FirstOrDefault()
             };
         }
 
