@@ -78,15 +78,44 @@ namespace SmartMenu.Services.OrderAPI.Controllers
 
         [Authorize]
         [HttpPost("CreateOrder")]
-        public async Task<ResponseDto> CreateOrder([FromBody] CartDto cartDto)
+        public async Task<ResponseDto> CreateOrder([FromBody] CartDto cartDto, [FromQuery] string deliveryMethod, [FromQuery] string? paymentMethod = null)
         {
             try
             {
+                bool isManager = User.IsInRole(SD.RoleManager);
+
+                if (isManager)
+                {
+                    paymentMethod = SD.PaymentMethod_OnPickup;
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(paymentMethod))
+                    {
+                        throw new Exception("Payment method is required for customer orders.");
+                    }
+
+                    if (deliveryMethod == SD.DeliveryMethod_Courier && paymentMethod != SD.PaymentMethod_Card)
+                    {
+                        throw new Exception("Courier delivery requires payment by card.");
+                    }
+
+                    if (deliveryMethod == SD.DeliveryMethod_SelfPickup &&
+                        paymentMethod != SD.PaymentMethod_Card &&
+                        paymentMethod != SD.PaymentMethod_OnPickup)
+                    {
+                        throw new Exception("Invalid payment method for self-pickup.");
+                    }
+                }
+
                 OrderHeaderDto orderHeaderDto = _mapper.Map<OrderHeaderDto>(cartDto.CartHeader);
                 orderHeaderDto.OrderTime = DateTime.Now;
                 orderHeaderDto.Status = SD.Status_Pending;
+                orderHeaderDto.DeliveryMethod = deliveryMethod;
+                orderHeaderDto.PaymentMethod = paymentMethod!;
                 orderHeaderDto.OrderDetails = _mapper.Map<IEnumerable<OrderDetailsDto>>(cartDto.CartDetails);
                 orderHeaderDto.OrderTotal = Math.Round(orderHeaderDto.OrderTotal, 2);
+
                 OrderHeader orderCreated = _db.OrderHeaders.Add(_mapper.Map<OrderHeader>(orderHeaderDto)).Entity;
                 await _db.SaveChangesAsync();
 
@@ -96,7 +125,7 @@ namespace SmartMenu.Services.OrderAPI.Controllers
             catch (Exception ex)
             {
                 _response.IsSuccess = false;
-                _response.Message=ex.Message;
+                _response.Message = ex.Message;
             }
             return _response;
         }
@@ -118,13 +147,7 @@ namespace SmartMenu.Services.OrderAPI.Controllers
                     
                 };
 
-                var DiscountsObj = new List<SessionDiscountOptions>()
-                {
-                    new SessionDiscountOptions
-                    {
-                        Coupon=stripeRequestDto.OrderHeader.CouponCode
-                    }
-                };
+                
 
                 foreach (var item in stripeRequestDto.OrderHeader.OrderDetails)
                 {
@@ -145,10 +168,7 @@ namespace SmartMenu.Services.OrderAPI.Controllers
                     options.LineItems.Add(sessionLineItem);
                 }
 
-                if (stripeRequestDto.OrderHeader.Discount > 0)
-                {
-                    options.Discounts = DiscountsObj;
-                }
+                
                 var service = new SessionService();
                 Session session = service.Create(options);
                 stripeRequestDto.StripeSessionUrl = session.Url;
@@ -186,15 +206,8 @@ namespace SmartMenu.Services.OrderAPI.Controllers
                 {
                     //then payment was successful
                     orderHeader.PaymentIntentId = paymentIntent.Id;
-                    orderHeader.Status = SD.Status_Approved;
+                    orderHeader.Status = SD.Status_Payed; 
                     _db.SaveChanges();
-                    RewardsDto rewardsDto = new()
-                    {
-                        OrderId = orderHeader.OrderHeaderId,
-                        RewardsActivity = Convert.ToInt32(orderHeader.OrderTotal),
-                        UserId = orderHeader.UserId
-                    };
-                    string topicName = _configuration.GetValue<string>("TopicAndQueueNames:OrderCreatedTopic");
                     _response.Result = _mapper.Map<OrderHeaderDto>(orderHeader);
                 }
 
@@ -214,28 +227,57 @@ namespace SmartMenu.Services.OrderAPI.Controllers
         {
             try
             {
-                OrderHeader orderHeader = _db.OrderHeaders.First(u => u.OrderHeaderId == orderId);
-                if (orderHeader != null)
+                var orderHeader = _db.OrderHeaders.FirstOrDefault(u => u.OrderHeaderId == orderId);
+                if (orderHeader == null)
                 {
-                    if(newStatus == SD.Status_Cancelled)
+                    _response.IsSuccess = false;
+                    _response.Message = "Order not found.";
+                    return _response;
+                }
+
+                if (newStatus == SD.Status_Cancelled)
+                {
+                    if (orderHeader.DeliveryMethod == SD.DeliveryMethod_Courier && orderHeader.Status == SD.Status_InDelivery)
                     {
-                        //we will give refund
-                        var options = new RefundCreateOptions
+                        _response.IsSuccess = false;
+                        _response.Message = "Order cannot be cancelled as it is already in delivery.";
+                        return _response;
+                    }
+
+                    if (orderHeader.DeliveryMethod == SD.DeliveryMethod_SelfPickup && orderHeader.Status == SD.Status_Delivered)
+                    {
+                        _response.IsSuccess = false;
+                        _response.Message = "Order cannot be cancelled as it is already ready for pickup.";
+                        return _response;
+                    }
+
+                    if (!string.IsNullOrEmpty(orderHeader.PaymentIntentId) && orderHeader.PaymentMethod == SD.PaymentMethod_Card)
+                    {
+                        var refundOptions = new RefundCreateOptions
                         {
                             Reason = RefundReasons.RequestedByCustomer,
                             PaymentIntent = orderHeader.PaymentIntentId
                         };
-
-                        var service = new RefundService();
-                        Refund refund = service.Create(options);
+                        var refundService = new RefundService();
+                        Refund refund = refundService.Create(refundOptions);
                     }
-                    orderHeader.Status = newStatus;
-                    _db.SaveChanges();
+                    else if (orderHeader.PaymentMethod == SD.PaymentMethod_OnPickup && orderHeader.Status != SD.Status_Payed)
+                    {
+                        _response.Message = "Order cancelled. No refund needed as it was not paid.";
+                    }
                 }
+
+                orderHeader.Status = newStatus;
+                await _db.SaveChangesAsync();
+
+                _response.Message = $"Order status updated to {newStatus}.";
+                _response.Result = _mapper.Map<OrderHeaderDto>(orderHeader);
+                _response.IsSuccess = true;
             }
             catch (Exception ex)
             {
                 _response.IsSuccess = false;
+                _response.Message = ex.Message;
             }
             return _response;
         }
