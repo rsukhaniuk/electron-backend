@@ -58,12 +58,16 @@ namespace SmartMenu.Services.AuthAPI.Service
             var roles = await _userManager.GetRolesAsync(user);
             var token = _jwtTokenGenerator.GenerateToken(user,roles);
 
+            var role = roles.FirstOrDefault();
+
             UserDto userDTO = new()
             {
                 Email = user.Email,
                 ID = user.Id,
                 Name = user.Name,
-                PhoneNumber = user.PhoneNumber
+                PhoneNumber = user.PhoneNumber,
+                Role = role
+
             };
 
             LoginResponseDto loginResponseDto = new LoginResponseDto()
