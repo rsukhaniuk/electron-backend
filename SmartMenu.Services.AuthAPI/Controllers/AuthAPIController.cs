@@ -23,18 +23,51 @@ namespace SmartMenu.Services.AuthAPI.Controllers
         }
 
 
+        //[HttpPost("register")]
+        //public async Task<IActionResult> Register([FromBody] RegistrationRequestDto model)
+        //{
+
+        //    var errorMessage = await _authService.Register(model);
+        //    if (!string.IsNullOrEmpty(errorMessage))
+        //    {
+        //        _response.IsSuccess = false;
+        //        _response.Message= errorMessage;
+        //        return BadRequest(_response);
+        //    }
+        //    return Ok(_response);
+        //}
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationRequestDto model)
         {
+            try
+            {
+                var errorMessage = await _authService.Register(model);
+                if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    _response.IsSuccess = false;
+                    _response.Message = errorMessage;
+                    return BadRequest(_response);
+                }
 
-            var errorMessage = await _authService.Register(model);
-            if (!string.IsNullOrEmpty(errorMessage))
+                var assignRoleSuccessful = await _authService.AssignRole(model.Email, model.Role.ToUpper());
+                if (!assignRoleSuccessful)
+                {
+                    _response.IsSuccess = false;
+                    _response.Message = "User registered, but failed to assign role.";
+                    return BadRequest(_response);
+                }
+
+                _response.IsSuccess = true;
+                _response.Message = $"User registered and role '{model.Role}' assigned successfully.";
+                return Ok(_response);
+            }
+            catch (Exception ex)
             {
                 _response.IsSuccess = false;
-                _response.Message= errorMessage;
-                return BadRequest(_response);
+                _response.Message = ex.Message;
+                return StatusCode(500, _response);
             }
-            return Ok(_response);
         }
 
         [HttpPost("login")]
