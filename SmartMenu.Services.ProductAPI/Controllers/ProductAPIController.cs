@@ -23,24 +23,25 @@ namespace SmartMenu.Services.ProductAPI.Controllers
             _response = new ResponseDto();
         }
 
-        //[HttpGet]
-        //public ResponseDto Get()
-        //{
-        //    try
-        //    {
-        //        var products = _db.Products.Include(p => p.Category).ToList(); // Include Category
-        //        _response.Result = _mapper.Map<IEnumerable<ProductDto>>(products);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.Message = ex.Message;
-        //    }
-        //    return _response;
-        //}
+        [HttpGet]
+        public ResponseDto Get()
+        {
+            try
+            {
+                var products = _db.Products.Include(p => p.Category).ToList(); // Include Category
+                _response.Result = _mapper.Map<IEnumerable<ProductDto>>(products);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+            }
+            return _response;
+        }
 
         [HttpGet]
-        public async Task<IActionResult> Get(
+        [Route("GetFilteredProducts")]
+        public async Task<IActionResult> GetFilteredProducts(
             [FromQuery] int categoryId = 0,
             [FromQuery] string sort = "name",
             [FromQuery] int pageIndex = 1,
