@@ -16,5 +16,8 @@ namespace SmartMenu.Services.OrderAPI.Models.Dto
         public IEnumerable<OrderDetailsDto> OrderDetails { get; set; }
         public string DeliveryMethod { get; set; }
         public string PaymentMethod { get; set; }
+        public int? StoreId { get; set; }
+
+        public string? ShippingAddress { get; set; }
     }
 }

@@ -78,7 +78,12 @@ namespace SmartMenu.Services.OrderAPI.Controllers
 
         [Authorize]
         [HttpPost("CreateOrder")]
-        public async Task<ResponseDto> CreateOrder([FromBody] CartDto cartDto, [FromQuery] string deliveryMethod, [FromQuery] string? paymentMethod = null)
+        public async Task<ResponseDto> CreateOrder(
+            [FromBody] CartDto cartDto,
+            [FromQuery] string deliveryMethod,
+            [FromQuery] string? paymentMethod = null,
+            [FromQuery] int? storeId = null,
+            [FromQuery] string? shippingAddress = null)
         {
             try
             {
@@ -106,6 +111,16 @@ namespace SmartMenu.Services.OrderAPI.Controllers
                     {
                         throw new Exception("Invalid payment method for self-pickup.");
                     }
+
+                    if (deliveryMethod == SD.DeliveryMethod_Courier && string.IsNullOrEmpty(shippingAddress))
+                    {
+                        throw new Exception("Shipping address is required for courier delivery.");
+                    }
+
+                    if (deliveryMethod == SD.DeliveryMethod_SelfPickup && storeId == null)
+                    {
+                        throw new Exception("Store ID is required for self-pickup.");
+                    }
                 }
 
                 OrderHeaderDto orderHeaderDto = _mapper.Map<OrderHeaderDto>(cartDto.CartHeader);
@@ -115,6 +130,9 @@ namespace SmartMenu.Services.OrderAPI.Controllers
                 orderHeaderDto.PaymentMethod = paymentMethod!;
                 orderHeaderDto.OrderDetails = _mapper.Map<IEnumerable<OrderDetailsDto>>(cartDto.CartDetails);
                 orderHeaderDto.OrderTotal = Math.Round(orderHeaderDto.OrderTotal, 2);
+
+                orderHeaderDto.StoreId = storeId;
+                orderHeaderDto.ShippingAddress = shippingAddress;
 
                 OrderHeader orderCreated = _db.OrderHeaders.Add(_mapper.Map<OrderHeader>(orderHeaderDto)).Entity;
                 await _db.SaveChangesAsync();

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmartMenu.Services.OrderAPI.Models
 {
@@ -17,6 +19,9 @@ namespace SmartMenu.Services.OrderAPI.Models
         public string? StripeSessionId { get; set; }
         public IEnumerable<OrderDetails> OrderDetails { get; set; }
         public string DeliveryMethod { get; set; } 
-        public string PaymentMethod { get; set; } 
+        public string PaymentMethod { get; set; }
+        public int? StoreId { get; set; }
+        public string? ShippingAddress { get; set; }
+
     }
 }
