@@ -1,7 +1,7 @@
 ﻿
 using SmartMenu.Services.OrderAPI.Models.Dto;
 
-namespace SmartMenu.Services.ShoppingCartAPI.Service.IService
+namespace SmartMenu.Services.OrderAPI.Service.IService
 {
     public interface IProductService
     {

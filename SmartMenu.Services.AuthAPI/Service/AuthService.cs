@@ -211,5 +211,15 @@ namespace SmartMenu.Services.AuthAPI.Service
                 PhoneNumber = user.PhoneNumber
             }).ToList();
         }
+
+        public async Task<int?> GetStoreIdAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                return null;
+
+            return user.StoreId;
+        }
     }
 }

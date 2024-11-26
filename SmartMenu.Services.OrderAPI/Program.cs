@@ -3,8 +3,8 @@ using SmartMenu.Services.OrderAPI;
 using SmartMenu.Services.OrderAPI.Data;
 using SmartMenu.Services.OrderAPI.Extensions;
 using SmartMenu.Services.OrderAPI.Utility;
-using SmartMenu.Services.ShoppingCartAPI.Service;
-using SmartMenu.Services.ShoppingCartAPI.Service.IService;
+using SmartMenu.Services.OrderAPI.Service;
+using SmartMenu.Services.OrderAPI.Service.IService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -23,10 +23,13 @@ IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<BackendApiAuthenticationHttpClientHandler>();
 builder.Services.AddHttpClient("Product", u => u.BaseAddress =
 new Uri(builder.Configuration["ServiceUrls:ProductAPI"])).AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
+builder.Services.AddHttpClient("Auth", u => u.BaseAddress =
+new Uri(builder.Configuration["ServiceUrls:AuthAPI"])).AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
 builder.Services.AddControllers();
 
 // Add CORS

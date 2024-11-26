@@ -3,13 +3,16 @@ using SmartMenu.Services.OrderAPI.Data;
 using SmartMenu.Services.OrderAPI.Models;
 using SmartMenu.Services.OrderAPI.Models.Dto;
 using SmartMenu.Services.OrderAPI.Utility;
-using SmartMenu.Services.ShoppingCartAPI.Service.IService;
+using SmartMenu.Services.OrderAPI.Service.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Stripe.Checkout;
 using Stripe;
 using Microsoft.EntityFrameworkCore;
+using SmartMenu.Services.OrderAPI.Service.IService;
+using Microsoft.AspNetCore.Identity;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace SmartMenu.Services.OrderAPI.Controllers
 {
@@ -21,13 +24,16 @@ namespace SmartMenu.Services.OrderAPI.Controllers
         private IMapper _mapper;
         private readonly AppDbContext _db;
         private IProductService _productService;
+        private IAuthService _authService;
+
         private readonly IConfiguration _configuration;
         public OrderAPIController(AppDbContext db,
-            IProductService productService, IMapper mapper, IConfiguration configuration)
+            IProductService productService, IAuthService authservice, IMapper mapper, IConfiguration configuration)
         {
             _db = db;
             this._response = new ResponseDto();
             _productService = productService;
+            _authService = authservice;
             _mapper = mapper;
             _configuration = configuration;
         }
@@ -42,6 +48,23 @@ namespace SmartMenu.Services.OrderAPI.Controllers
                 if (User.IsInRole(SD.RoleAdmin))
                 {
                     objList = _db.OrderHeaders.Include(u => u.OrderDetails).OrderByDescending(u => u.OrderHeaderId).ToList();
+                }
+                else if (User.IsInRole(SD.RoleManager))
+                {
+                    // Отримуємо StoreId через AuthService
+
+                    var storeId = _authService.GetStoreIdAsync(userId);
+
+                    if (storeId == null)
+                    {
+                        throw new Exception("Store ID is not defined for the current manager.");
+                    }
+
+                    objList = _db.OrderHeaders
+                        .Include(u => u.OrderDetails)
+                        .Where(u => u.StoreId == storeId.Result)
+                        .OrderByDescending(u => u.OrderHeaderId)
+                        .ToList();
                 }
                 else
                 {

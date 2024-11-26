@@ -1,8 +1,8 @@
 ﻿using SmartMenu.Services.OrderAPI.Models.Dto;
-using SmartMenu.Services.ShoppingCartAPI.Service.IService;
+using SmartMenu.Services.OrderAPI.Service.IService;
 using Newtonsoft.Json;
 
-namespace SmartMenu.Services.ShoppingCartAPI.Service
+namespace SmartMenu.Services.OrderAPI.Service
 {
     public class ProductService : IProductService
     {

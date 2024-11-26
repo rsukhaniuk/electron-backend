@@ -307,5 +307,33 @@ namespace SmartMenu.Services.AuthAPI.Controllers
                 return StatusCode(500, _response);
             }
         }
+
+        [Authorize(Roles = "ADMIN,MANAGER")]
+        [HttpGet("GetStoreId/{userId}")]
+        public async Task<IActionResult> GetStoreId(string userId)
+        {
+            try
+            {
+                // Використовуємо AuthService для отримання StoreId
+                var storeId = await _authService.GetStoreIdAsync(userId);
+
+                if (storeId == null)
+                {
+                    _response.IsSuccess = false;
+                    _response.Message = "Store ID not found for the given user.";
+                    return NotFound(_response);
+                }
+
+                _response.Result = storeId;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = $"An error occurred: {ex.Message}";
+                return StatusCode(500, _response);
+            }
+        }
     }
 }

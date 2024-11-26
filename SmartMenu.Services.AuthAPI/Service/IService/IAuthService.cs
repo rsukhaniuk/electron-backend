@@ -12,7 +12,7 @@ namespace SmartMenu.Services.AuthAPI.Service.IService
         Task<bool> ChangePassword(string userId, ChangePasswordDto changePasswordDto);
         Task<EditAccountDto?> GetUserDetailsAsync(string userId);
         Task<IEnumerable<UserDto>> GetUsersByRoleAsync(string role);
-
+        Task<int?> GetStoreIdAsync(string userId);
 
     }
 }
