@@ -24,5 +24,19 @@ namespace SmartMenu.Services.ShoppingCartAPI.Service
             }
             return new List<ProductDto>();
         }
+
+        public async Task<CategoryDto> GetCategoryById(int CategoryId)
+        {
+            var client = _httpClientFactory.CreateClient("Product");
+            var response = await client.GetAsync($"/api/category/{CategoryId}");
+            var apiContet = await response.Content.ReadAsStringAsync();
+            var resp = JsonConvert.DeserializeObject<ResponseDto>(apiContet);
+            if (resp.IsSuccess)
+            {
+                return JsonConvert.DeserializeObject<CategoryDto>(Convert.ToString(resp.Result));
+            }
+            return new CategoryDto();
+        }
     }
+
 }

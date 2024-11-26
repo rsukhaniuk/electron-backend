@@ -45,6 +45,7 @@ namespace SmartMenu.Services.ShoppingCartAPI.Controllers
                 foreach (var item in cart.CartDetails)
                 {
                     item.Product = productDtos.FirstOrDefault(u => u.ProductId == item.ProductId);
+                    item.Product.CategoryName = (await _productService.GetCategoryById(item.Product.CategoryId)).Name;
                     cart.CartHeader.CartTotal += (item.Count * item.Product.Price);
                 }
 
